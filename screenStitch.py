@@ -15,8 +15,8 @@ if you tell me. Please leave this notice intact.
 """
 
 from PIL import Image, ImageChops
-from Tkinter import Tk
-from tkFileDialog import askopenfilenames
+from tkinter import Tk
+from tkinter.filedialog import askopenfilenames
 import subprocess
 import platform
 import shutil
@@ -26,10 +26,9 @@ if platform.system()=="Windows":
 	foldersep = "\\"
 else:
 	foldersep = "/"
-print "Made by jaflo on github"
 Tk().withdraw()
 files = askopenfilenames(title="Choose images")
-print "Choose images to compare"
+print("Choose images to compare")
 images = []
 i = 0
 imagergbprev = 0
@@ -45,13 +44,13 @@ for file in files:
 	image = Image.open(file)
 	imagergb = image.convert("RGB")
 	if i == 1:
-		print "Performing analysis"
+		print("Performing analysis")
 		width, height = image.size
-		for x in xrange(1, width):
-			for y in xrange(1, height):
+		for x in range(1, width):
+			for y in range(1, height):
 				r, g, b = imagergb.getpixel((x, y))
 				if imagergb.getpixel((x, y)) != imagergbprev.getpixel((x, y)):
-					#print "%d, %d" % (x, y)
+					#print("%d, %d" % (x, y))
 					if leftmost > x:
 						leftmost = x
 					if rightmost < x:
@@ -60,7 +59,7 @@ for file in files:
 						topmost = y
 					if bottommost < y:
 						bottommost = y
-		print "Differences at (%d, %d) to (%d, %d)" % (leftmost, rightmost, topmost, bottommost)
+		print("Differences at (%d, %d) to (%d, %d)" % (leftmost, rightmost, topmost, bottommost))
 	if i > 0:
 		if i == 1:
 			imagergbprev.crop((leftmost, topmost, rightmost, bottommost)).save("stitchtmp"+foldersep+"diff0.png")
@@ -77,7 +76,7 @@ fullimage = Image.new("RGB", (rightmost-leftmost-11, 9999), "black")
 Image.new("RGB", (rightmost-leftmost, 2000), "black").save("stitchtmp"+foldersep+"diff"+str(total-1)+".png")
 lineonnew = 0
 
-print "Stitching"
+print("Stitching")
 for num in range(0, total):
 	if i > 0:
 		image1 = Image.open("stitchtmp"+foldersep+"diff"+str(i-1)+".png")
@@ -86,7 +85,7 @@ for num in range(0, total):
 		image2rgb = image2.convert("RGB")
 		width, height = image1.size
 		sodone = False
-		for line in xrange(0, height):
+		for line in range(0, height):
 			im1 = image1rgb.crop((0, line, width, line+1))
 			im2 = image2rgb.crop((0, 1, width, 2))
 			if ImageChops.difference(im1, im2).getbbox() is None:
@@ -97,7 +96,7 @@ for num in range(0, total):
 					lineonnew+=1
 	i+=1
 
-print "Cropping"
+print("Cropping")
 bg = Image.new(fullimage.mode, fullimage.size, (0,0,0))
 diff = ImageChops.difference(fullimage, bg)
 diff = ImageChops.add(diff, diff, 2.0, -100)
@@ -114,4 +113,4 @@ else:
 		subprocess.call(["open", "-R", files[0][0:files[0].rfind(foldersep)]+foldersep+"stitch.png"])
 
 shutil.rmtree("stitchtmp")
-print "Done!"
+print("Done!")
